@@ -1,0 +1,174 @@
+Option Explicit
+Dim MyBrowser, Keyword
+Set MyBrowser = Browser("micclass:=Browser", "CreationTime:=0", "title:=.*").Page("micclass:=Page", "CreationTime:=0", "title:=.*")
+
+'*************************************************
+'Function to click on a button
+'*************************************************
+	'Purpose: Click on any button
+	'I/P: Html Tag, Name
+	'O/P: None
+Function button_click (Prop_HtmlTag, Prop_Name)
+	Dim oWebButton
+	Set oWebButton = Description.Create
+	oWebButton("html tag").Value = Prop_HtmlTag
+	oWebButton("name").Value = Prop_Name
+	MyBrowser.WebButton(oWebButton).Click
+	wait 10
+	If MyBrowser.WebButton("class:=close", "html tag:=BUTTON", "innertext:=×").Exist(10) Then
+		MyBrowser.WebButton("class:=close", "html tag:=BUTTON", "innertext:=×").Click
+		wait 5
+	End If
+	
+'Calling the Sub Procedure called spErrorReports which contains the actions (or steps or lines of code) required for reporting any errors	
+spErrorReports
+	
+	Set oWebButton = Nothing
+End Function
+'*************************************************
+
+'*************************************************
+'Function to Select from a Web List
+'*************************************************
+	'Purpose: Select an Item from a WebList
+	'I/P: Html Tag, Name, WL_Value
+	'O/P: None
+Function list_select (Prop_HtmlTag, Prop_Name, WL_Value)
+	Dim oWebList
+	Set oWebList = Description.Create
+	oWebList("html tag").Value = Prop_HtmlTag
+	oWebList("name").Value = Prop_Name
+	MyBrowser.WebList(oWebList).Select WL_Value
+	Set oWebList = Nothing
+	
+'Calling the Sub Procedure called spErrorReports which contains the actions (or steps or lines of code) required for reporting any errors		
+spErrorReports
+	
+End Function
+'*************************************************
+
+'*************************************************
+'Function to Set the text in a web edit
+'*************************************************
+	'Purpose: Set the text in a web edit
+	'I/P: Html Tag, Name, WE_Value
+	'O/P: 
+Function edit_set (Prop_HtmlTag, Prop_Name, WE_Value)
+	Dim oWebEdit
+	Set oWebEdit = Description.Create
+	oWebEdit("html tag").Value = Prop_HtmlTag
+	oWebEdit("name").Value = Prop_Name
+	MyBrowser.WebEdit(oWebEdit).Set WE_Value
+	Set oWebEdit = Nothing
+	
+'Calling the Sub Procedure called spErrorReports which contains the actions (or steps or lines of code) required for reporting any errors		
+spErrorReports
+	
+End Function
+'*************************************************
+
+'*************************************************
+'Function to Check text on a page
+'*************************************************
+	'Purpose: Check text on a page
+	'I/P: Html Tag, Innertext
+	'O/P: True or False
+Function text_check (Prop_HtmlTag, Prop_Innertext)
+	Dim oWebElement
+	Set oWebElement = Description.Create
+	oWebElement("html tag").Value = Prop_HtmlTag
+	oWebElement("innertext").Value = Prop_Innertext
+	If MyBrowser.WebElement(oWebElement).Exist(15) Then
+		text_check = True
+		Else
+		text_check = False
+	Set oWebElement = Nothing
+	End If
+	
+'Calling the Sub Procedure called spErrorReports which contains the actions (or steps or lines of code) required for reporting any errors		
+spErrorReports
+	
+End Function
+'*************************************************
+
+'*************************************************
+'Function to Click on a link
+'*************************************************
+	'Purpose: Click on a Link
+	'I/P: Html Tag, Text
+	'O/P: 
+Function link_click (Prop_HtmlTag, Prop_Text, Prop_Index)
+	Dim oLink
+	Set oLink = Description.Create
+	oLink("html tag").Value = Prop_HtmlTag
+	oLink("text").Value = Prop_Text
+	oLink("Index").Value = Prop_Index
+	MyBrowser.Link(oLink).click
+	wait 5
+	Set oLink = Nothing
+	
+'Calling the Sub Procedure called spErrorReports which contains the actions (or steps or lines of code) required for reporting any errors		
+spErrorReports
+	
+End Function
+'*************************************************
+
+'*************************************************
+'Function to Check a Link on a page
+'*************************************************
+	'Purpose: Check a link on a page
+	'I/P: 
+	'O/P: True or False
+Function link_check (Prop_HtmlTag, Prop_Innertext)
+	Dim oLink
+	Set oLink = Description.Create
+	oLink("html tag").Value = Prop_HtmlTag
+	oLink("text").Value = Prop_Innertext
+	If MyBrowser.Link(oLink).Exist(3) Then
+		link_check = True
+		Else
+		link_check = False
+	End If
+	Set oLink = Nothing
+	
+	
+'Calling the Sub Procedure called spErrorReports which contains the actions (or steps or lines of code) required for reporting any errors		
+spErrorReports
+	
+End Function
+'*************************************************
+
+'*************************************************
+'Function to Open a Browser and go to a webpage
+'*************************************************
+	'Purpose: Open a browser and go to a web page
+	'I/P: Browser, URL
+	'O/P: None
+Function browser_open (Browsers, URL)
+	SystemUtil.Run Browsers, URL
+
+
+'Calling the Sub Procedure called spErrorReports which contains the actions (or steps or lines of code) required for reporting any errors	
+spErrorReports
+	
+End Function
+'*************************************************
+
+'*************************************************
+'Function to Close a Browser 
+'*************************************************
+	'Purpose: Close a browser 
+	'I/P: Browser
+	'O/P: None
+Function browser_close (Browsers)
+	SystemUtil.CloseProcessByName Browsers
+
+
+'Calling the Sub Procedure called spErrorReports which contains the actions (or steps or lines of code) required for reporting any errors	
+spErrorReports
+	
+End Function
+'*************************************************
+
+
+

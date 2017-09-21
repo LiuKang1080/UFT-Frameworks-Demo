@@ -1,0 +1,88 @@
+Option Explicit
+
+Dim TC_Rows, TS_Rows, TC_Sheet, TS_Sheet, i, j, Execute_Test, TCID, TSID
+Dim Keyword, IP1, IP2, IP3, IP4
+
+'Associate Function Library
+ExecuteFile "C:\Users\Shiva\Desktop\Weekend Summer 2016\KDF - INDEED\Function Library.vbs"
+
+'Connect To Excel
+fnConnectExcel "C:\Users\Shiva\Desktop\Weekend Summer 2016\KDF - INDEED\Keywords, TCs, TSs (INDEED).xlsx"
+
+'Counting the number of rows in the TC Sheet and TS Sheet
+TC_Rows = TC_Sheet.UsedRange.Rows.Count
+TS_Rows = TS_Sheet.UsedRange.Rows.Count
+
+
+'Go to each row in the TC Sheet and see if the execute flag is 'Y'
+For i = 2 To TC_Rows
+	Execute_Test = TC_Sheet.cells(i,"D").Value
+	If Execute_Test = "Y" Then
+		TCID = TC_Sheet.cells(i,"A")
+		Print "The test case for execution is: " & TCID
+		'If 'Y' then go to each row in the TS Sheet and see if the TCIDs match
+		
+		For j = 2 To TS_Rows
+			TSID = TS_Sheet.cells(j,"A").Value
+			
+			If TCID=TSID Then
+				'Reading the values for Keyword and the inputs from the TestSteps Sheet
+				Keyword = TS_Sheet.cells(j,"D")
+				IP1 = TS_Sheet.cells(j,"E")
+				IP2 = TS_Sheet.cells(j,"F")
+				IP3 = TS_Sheet.cells(j,"G") 
+				IP4 = TS_Sheet.cells(j,"H")
+				
+				Print "Keyword for Execution is: " & Keyword
+				
+				'Execute the CORRESPONDING Test Steps (or keywords)
+					Select Case Keyword
+						Case "browser_close"
+							browser_close IP1
+						Case "browser_open"
+							browser_open IP1, IP2
+						Case "edit_set"
+							edit_set IP1, IP2, IP3, IP4
+						Case "button_click"
+							button_click IP1, IP2, IP3
+						Case "text_check"
+							If text_check(IP1, IP2) Then
+								Print "Text Verified"
+								Else
+								Print "Text Not Verified"
+							End If
+						Case "text_check2"
+							If text_check2(IP1, IP2) Then
+								Print "Appropriate Filter was not applied"
+								Else
+								Print "Appropriate Filter was applied"
+							End If
+						Case "link_click"
+							link_click IP1, IP2, IP3
+						Case "list_select"
+							list_select IP1, IP2 , IP3, IP4
+						Case "list_check"
+							If list_check (IP1, IP2, IP3, IP4) Then
+								Print "Appropriate item was selected"
+								Else
+								Print "Appropriate item was not selected"
+							End If
+						Case Else 
+							msgbox "Check your keywords"
+					End Select 'Ending the Select Case Statement
+			End If 'Ending the TCID=TSID Conditional Statement
+		Next 'Continuing the iteration for the TS_Sheet (j)
+	End If 'Ending Execute_Test = "Y" Conditional Statement
+Next 'Continuing the iteration for the TC_Sheet (i)
+
+'Save changes to Excel and Quit Excel
+fnQuitExcel
+
+
+
+
+
+
+'Each keyword function to return a PASS or FAIL along with a Test Result
+
+

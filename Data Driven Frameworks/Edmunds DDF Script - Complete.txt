@@ -1,0 +1,72 @@
+Option Explicit
+Dim MonthlyPayment, ZipCode, LoanTerm, Rate, TradeIn, AmtOwed, DwnPmt
+
+Dim Row_Count, i
+
+
+'Associate Function Library
+'LoadFunctionLibrary ("C:\Users\Shiva\Desktop\Weekdays summer 2016\Function Libraries\Edmunds_Script.qfl")
+ExecuteFile "C:\Users\Shiva\Desktop\Weekdays summer 2016\Scripts as notes\Framework\Data Driven Framework\Edmunds DDF Function Library.vbs"
+'I usually don't use LoadFunctionLibrary, I normally use ExecuteFile (which is working fine here)
+
+
+'Calling my functions
+
+'Connect to Excel
+fnConnectExcel "C:\Users\Shiva\Desktop\Weekdays summer 2016\Edmunds_Excel.xlsx", "TestData"
+
+
+
+Row_Count = MySheet.UsedRange.Rows.Count 
+msgbox Row_Count
+
+For i = 2 To Row_Count
+	
+'Reading Values from Excel
+fnReadExcel 
+
+'Launch the Application
+fnLaunchApp "iexplore.exe", "www.edmunds.com/calculators"
+
+'Enter monthly payment
+fnEnterText "input-dollar", "calc_input3", "INPUT", MonthlyPayment
+
+'Click on Go
+fnClickElement "Go", "SPAN", 2
+
+'Enter Zip Code
+fnEnterText "calc-zipcode", "ac_zip_code", "INPUT", ZipCode
+wait 2
+
+'click on update zip code
+fnClickElement "Update Zip Code", "SPAN", 0
+
+
+'Select Loan Term
+fnSelectList "SELECT", "ac_loan_term", LoanTerm
+Wait 2
+
+'Enter the Rate
+fnEnterText "input-percentage", "ac_market_finance_rate", "INPUT", Rate
+wait 2
+
+'Enter the Trade In amt
+fnEnterText "input-dollar", "ac_vehicle2_price", "INPUT", TradeIn
+wait 5
+
+'Enter the Amt Owed
+fnEnterText "input-dollar", "ac_vehicle2_value_owed", "INPUT", AmtOwed
+
+'Enter the Cash Down Pmt
+fnEnterText "input-dollar", "ac_cash_down_payment", "INPUT", DwnPmt
+
+'Click on Calculate
+fnClickElement "Calculate", "SPAN", 0
+
+wait 10
+
+'Compare Actual with Expected Value
+fnCompare "calc-results-total", "ac_max_tmv_result", "SPAN"
+
+
+Next

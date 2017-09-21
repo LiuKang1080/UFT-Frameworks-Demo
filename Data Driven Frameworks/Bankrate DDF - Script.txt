@@ -1,0 +1,137 @@
+Option Explicit
+Dim MyBrowser, i, Row_Count
+Dim MyExcel, Loan1Data, Loan2Data, Loan3Data, Results, URL_Sheet
+
+Set MyBrowser = Browser("micclass:=Browser", "creationtime:=0", "title:=.*").Page("micclass:=Page", "creationtime:=0", "title:=.*")
+
+
+'Associate Function Library
+ExecuteFile "C:\Users\Shiva\Framework\Data Driven Framework\Bankrate DDF Function Library.vbs"
+
+'Connect to Excel
+fnConnectExcel "C:\Users\Shiva\Desktop\Weekdays summer 2016\Bankrate Test Data.xlsx"
+
+Row_Count = Loan1Data.usedrange.rows.count
+msgbox Row_Count
+
+For i = 2 To Row_Count
+	
+Dim Loan1Amount, Rate1, Loan1Term, Amortization1, OrgFee1, CommitFee1, OtherFees1, OtherCosts1
+Dim Loan2Amount, Rate2, Loan2Term, Amortization2, OrgFee2, CommitFee2, OtherFees2, OtherCosts2
+Dim Loan3Amount, Rate3, Loan3Term, Amortization3, OrgFee3, CommitFee3, OtherFees3, OtherCosts3
+Dim URL
+
+'Read Data from Excel
+'Loan 1 Data
+Loan1Amount = Loan1Data.Cells(i,"A")
+Rate1 = Loan1Data.Cells(i,"B")
+Loan1Term = Loan1Data.Cells(i,"C")
+Amortization1 = Loan1Data.Cells(i,"D")
+OrgFee1 = Loan1Data.Cells(i,"E")
+CommitFee1 = Loan1Data.Cells(i,"F")
+OtherFees1 = Loan1Data.Cells(i,"G")
+OtherCosts1 = Loan1Data.Cells(i,"H")
+	'Loan 2 Data
+	Loan2Amount = Loan2Data.Cells(i,"A")
+	Rate2 = Loan2Data.Cells(i,"B")
+	Loan2Term = Loan2Data.Cells(i,"C")
+	Amortization2 = Loan2Data.Cells(i,"D")
+	OrgFee2 = Loan2Data.Cells(i,"E")
+	CommitFee2 = Loan2Data.Cells(i,"F")
+	OtherFees2 = Loan2Data.Cells(i,"G")
+	OtherCosts2 = Loan2Data.Cells(i,"H")
+		'Loan 3 Data
+			Loan3Amount = Loan3Data.Cells(i,"A")
+			Rate3 = Loan3Data.Cells(i,"B")
+			Loan3Term = Loan3Data.Cells(i,"C")
+			Amortization3 = Loan3Data.Cells(i,"D")
+			OrgFee3 = Loan3Data.Cells(i,"E")
+			CommitFee3 = Loan3Data.Cells(i,"F")
+			OtherFees3 = Loan3Data.Cells(i,"G")
+			OtherCosts3 = Loan3Data.Cells(i,"H")
+	URL = URL_Sheet.Cells(1,"A").Value
+
+'Launch The Application
+fnLaunchApp "iexplore.exe", URL
+wait 2
+
+'Toggle Loan Calculators
+spToggleCalcs
+
+'Loan 1 Actions
+
+'Loan 1 Amount
+fnEnterText "KJEInput KJEInputModern", "INPUT", "LOAN_AMOUNT1", Loan1Amount
+'Loan 1 Rate
+fnEnterText "KJEInput KJEInputModern", "INPUT", "INTEREST_RATE1", Rate1
+'Loan 1 Term
+fnSelectList "SELECT", "LOAN_TERM1", "KJE-LOAN_TERM1", Loan1Term
+'Loan 1 Amortization
+fnSelectList "SELECT", "AMORTIZATION1", "KJE-AMORTIZATION1", Amortization1
+'Loan 1 Org Fee
+fnEnterText "KJEInput KJEInputModern", "INPUT", "ORIGINATION_FEE1", OrgFee1
+'Loan 1 Commit Fee
+fnEnterText "KJEInput KJEInputModern", "INPUT", "COMMITMENT_FEE1", CommitFee1
+'Loan 1 Other Fees
+fnEnterText "KJEInput KJEInputModern", "INPUT", "OTHER_FEES1", OtherFees1
+'Loan 1 Other Costs
+fnEnterText "KJEInput KJEInputModern", "INPUT", "OTHER_COSTS1", OtherCosts1
+
+'Loan 2 Actions
+
+'Loan 2 Amount
+fnEnterText "KJEInput KJEInputModern", "INPUT", "LOAN_AMOUNT2", Loan2Amount
+'Loan 2 Rate
+fnEnterText "KJEInput KJEInputModern", "INPUT", "INTEREST_RATE2", Rate2
+'Loan 2 Term
+fnSelectList "SELECT", "LOAN_TERM2", "KJE-LOAN_TERM2", Loan2Term
+'Loan 2 Amortization
+fnSelectList "SELECT", "AMORTIZATION2", "KJE-AMORTIZATION2", Amortization2
+'Loan 2 Org Fee
+fnEnterText "KJEInput KJEInputModern", "INPUT", "ORIGINATION_FEE2", OrgFee2
+'Loan 2 Commit Fee
+fnEnterText "KJEInput KJEInputModern", "INPUT", "COMMITMENT_FEE2", CommitFee2
+'Loan 2 Other Fees
+fnEnterText "KJEInput KJEInputModern", "INPUT", "OTHER_FEES2", OtherFees2
+'Loan 2 Other Costs
+fnEnterText "KJEInput KJEInputModern", "INPUT", "OTHER_COSTS2", OtherCosts2
+
+
+'Loan 3 Actions
+
+'Loan 3 Amount
+fnEnterText "KJEInput KJEInputModern", "INPUT", "LOAN_AMOUNT3", Loan3Amount
+'Loan 3 Rate
+fnEnterText "KJEInput KJEInputModern", "INPUT", "INTEREST_RATE3", Rate3
+'Loan 3 Term
+fnSelectList "SELECT", "LOAN_TERM3", "KJE-LOAN_TERM3", Loan3Term
+'Loan 3 Amortization
+fnSelectList "SELECT", "AMORTIZATION3", "KJE-AMORTIZATION3", Amortization3
+'Loan 3 Org Fee
+fnEnterText "KJEInput KJEInputModern", "INPUT", "ORIGINATION_FEE3", OrgFee3
+'Loan 3 Commit Fee
+fnEnterText "KJEInput KJEInputModern", "INPUT", "COMMITMENT_FEE3", CommitFee3
+'Loan 3 Other Fees
+fnEnterText "KJEInput KJEInputModern", "INPUT", "OTHER_FEES3", OtherFees3
+'Loan 3 Other Costs
+fnEnterText "KJEInput KJEInputModern", "INPUT", "OTHER_COSTS3", OtherCosts3
+
+'Capture Monthly Payments
+spCapturePayments
+
+'Go to Report
+fnClickButton "View Report", "KJEViewReport"
+
+wait 2
+
+'Capture Closing Costs
+fnVerifyCosts 11, 2
+fnVerifyCosts 11, 3
+fnVerifyCosts 11, 4
+
+'Click on Hide Report
+fnClickButton "Hide Report", "KJEViewReport"
+
+wait 2
+
+Next

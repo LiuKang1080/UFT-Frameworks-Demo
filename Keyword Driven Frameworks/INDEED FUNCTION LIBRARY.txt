@@ -1,0 +1,299 @@
+'Function Library for Indeed KDF
+Option Explicit
+
+Dim MyBrowser, Keyword
+Set MyBrowser = Browser("micclass:=Browser", "CreationTime:=0", "title:=.*").Page("micclass:=Page", "CreationTime:=0", "title:=.*")
+
+Dim MyExcel, TS_Sheet, TC_Sheet
+
+'Function to Click on a Button
+'Inputs: Prop_Name, Prop_Class, Prop_HtmlID
+'Outputs: N/A
+Function button_click (Prop_Name, Prop_Class, Prop_HtmlID)
+	Dim oWebButton
+	Set oWebButton = Description.Create
+	oWebButton("name").Value = Prop_Name
+	oWebButton("Class").Value = Prop_Class
+	oWebButton("html id").Value = Prop_HtmlID
+	MyBrowser.WebButton(oWebButton).Click
+	
+	
+	If fnErrorReport = Keyword & " Passed" Then
+		TS_Sheet.Cells(j, "I").Value = "Passed"
+		TS_Sheet.cells(j,"J").Value = "N/A"
+		Else
+		TS_Sheet.Cells(j,"I").Value = "Failed"
+		TS_Sheet.Cells(j,"J").Value = fnErrorReport
+	End If
+	
+	
+	Set oWebButton = Nothing
+End Function
+
+'Function to Enter text in a WebEdit
+'Inputs: Prop_Name, Prop_Class, Prop_HtmlID, WE_Value
+'Outputs: N/A
+Function edit_set (Prop_Name, Prop_Class, Prop_HtmlID, WE_Value)
+	Dim oWebEdit
+	Set oWebEdit = Description.Create
+	oWebEdit("name").Value = Prop_Name
+	oWebEdit("class").Value = Prop_Class
+	oWebEdit("html id").Value = Prop_HtmlID
+	MyBrowser.WebEdit(oWebEdit).Set WE_Value
+	
+	
+	If fnErrorReport = Keyword & " Passed" Then
+		TS_Sheet.Cells(j, "I").Value = "Passed"
+		TS_Sheet.cells(j,"J").Value = "N/A"
+		Else
+		TS_Sheet.Cells(j,"I").Value = "Failed"
+		TS_Sheet.Cells(j,"J").Value = fnErrorReport
+	End If
+	
+	
+	Set oWebEdit = Nothing
+End Function
+
+'Function to Verify Text on a Page
+'Inputs: Prop_HtmlTag, Prop_Innertext
+'Outputs: True OR False
+Function text_check(Prop_HtmlTag, Prop_Innertext)
+	Dim oWebElement
+	Set oWebElement = Description.create
+	oWebElement ("html tag").value = Prop_HtmlTag
+	oWebElement ("innertext").value = Prop_Innertext
+	
+	If MyBrowser.WebElement(oWebElement).exist(3) Then
+		text_check = TRUE
+		else
+		text_check = FALSE
+	End If
+	
+	If fnErrorReport = Keyword & " Passed" Then
+		TS_Sheet.Cells(j, "I").Value = "Passed"
+		TS_Sheet.cells(j,"J").Value = "N/A"
+		Else
+		TS_Sheet.Cells(j,"I").Value = "Failed"
+		TS_Sheet.Cells(j,"J").Value = fnErrorReport
+	End If
+	
+	
+	Set oWebElement = nothing
+End Function
+
+'Function to Click on a Link
+'Inputs: Prop_Name, Prop_Href, Prop_HtmlTag
+'Outputs: N/A
+Function link_click(Prop_Name, Prop_Href, Prop_HtmlTag)
+	Dim oLink
+	Set oLink = Description.Create
+	oLink("name").Value = Prop_Name
+	oLink("href").Value = Prop_Href
+	oLink("html tag").Value = Prop_HtmlTag
+	MyBrowser.Link(oLink).Click
+	
+	
+	If fnErrorReport = Keyword & " Passed" Then
+		TS_Sheet.Cells(j, "I").Value = "Passed"
+		TS_Sheet.cells(j,"J").Value = "N/A"
+		Else
+		TS_Sheet.Cells(j,"I").Value = "Failed"
+		TS_Sheet.Cells(j,"J").Value = fnErrorReport
+	End If
+	
+	Set oLink = Nothing
+End Function
+
+
+'Function to Verify a Link
+'Inputs: Prop_Name, Prop_Href, Prop_HtmlTag
+'Outputs: N/A
+Function link_check(Prop_Name, Prop_Href, Prop_HtmlTag)
+	Dim oLink
+	Set oLink = Description.Create
+	oLink("name").Value = Prop_Name
+	oLink("href").Value = Prop_Href
+	oLink("html tag").Value = Prop_HtmlTag
+	
+	If MyBrowser.Link(oLink).Exist(3) Then
+		link_check = true
+	Else
+		link_check = false
+	End If
+	
+	
+	If fnErrorReport = Keyword & " Passed" Then
+		TS_Sheet.Cells(j, "I").Value = "Passed"
+		TS_Sheet.cells(j,"J").Value = "N/A"
+		Else
+		TS_Sheet.Cells(j,"I").Value = "Failed"
+		TS_Sheet.Cells(j,"J").Value = fnErrorReport
+	End If
+	
+	Set oLink = Nothing
+End Function
+
+'Function to open a Browser
+'Inputs: Browsers, URL
+'Outputs: N/A
+Function browser_open (Browsers, URL)
+	SystemUtil.Run Browsers, URL
+	
+	If fnErrorReport = Keyword & " Passed" Then
+		TS_Sheet.Cells(j, "I").Value = "Passed"
+		TS_Sheet.cells(j,"J").Value = "N/A"
+		Else
+		TS_Sheet.Cells(j,"I").Value = "Failed"
+		TS_Sheet.Cells(j,"J").Value = fnErrorReport
+	End If
+	
+	
+End Function
+
+'Function to close any open Browsers
+'Inputs: Browsers
+'Outputs: N/A
+Function browser_close (Browsers)
+	SystemUtil.CloseProcessByName Browsers
+	
+	
+	If fnErrorReport = Keyword & " Passed" Then
+		TS_Sheet.Cells(j, "I").Value = "Passed"
+		TS_Sheet.cells(j,"J").Value = "N/A"
+		Else
+		TS_Sheet.Cells(j,"I").Value = "Failed"
+		TS_Sheet.Cells(j,"J").Value = fnErrorReport
+	End If
+	
+	
+End Function
+
+'Function to Select from WebList 
+'Inputs:prop_htmlid,Prop_name,Prop_htmltag,WL_Value
+'Outputs: N/A
+Function list_select(Prop_HtmlID, Prop_Name, Prop_HtmlTag, WL_Value)
+      Dim OWeblist
+	  Set OWebList = Description.create
+	  OWebList ("html id").value = prop_htmlid
+	  OWebList ("name").value = Prop_name
+	  OWebList ("html tag").value = Prop_htmltag
+	  MyBrowser.WebList(OwebList).Select WL_Value
+	  
+	  
+	  If fnErrorReport = Keyword & " Passed" Then
+		TS_Sheet.Cells(j, "I").Value = "Passed"
+		TS_Sheet.cells(j,"J").Value = "N/A"
+		Else
+		TS_Sheet.Cells(j,"I").Value = "Failed"
+		TS_Sheet.Cells(j,"J").Value = fnErrorReport
+	End If
+	  
+	  
+	  Set OWebList = Nothing
+End function
+
+
+'Function to verify a selected value from a weblist  
+'Inputs: Prop_h=HtmlID, Prop_Name, Prop_HtmlTag
+'Outputs: True or False
+Function list_check (Prop_HtmlID, Prop_Name, Prop_HtmlTag, Prop_Selection)
+	Dim oWebList
+	Set oWebList = Description.Create
+	oWebList("html id").Value =Prop_HtmlID
+	oWebList("name").Value =Prop_Name
+	oWebList("html tag").Value =Prop_HtmlTag
+	oWebList ("selection").Value = Prop_Selection
+	
+	If MyBrowser.WebList(oWebList).Exist(3)Then
+		list_check = True
+	Else
+		list_check = False
+	End if
+	
+	If fnErrorReport = Keyword & " Passed" Then
+		TS_Sheet.Cells(j, "I").Value = "Passed"
+		TS_Sheet.cells(j,"J").Value = "N/A"
+		Else
+		TS_Sheet.Cells(j,"I").Value = "Failed"
+		TS_Sheet.Cells(j,"J").Value = fnErrorReport
+	End If
+	
+	
+	Set oWebList = Nothing
+	
+End Function
+
+
+'Function to Connect to Excel
+'Inputs: 
+'Outputs: N/A
+Function fnConnectExcel (FilePath)
+	
+	Set MyExcel = CreateObject ("Excel.Application")
+	MyExcel.Workbooks.open FilePath
+	Set TC_Sheet = MyExcel.ActiveWorkbook.Worksheets ("TestCases")
+	Set TS_Sheet = MyExcel.ActiveWorkbook.Worksheets ("TestSteps")
+	
+End Function
+
+
+'Function to Report Errors
+Function fnErrorReport
+	
+	If err.number <> 0 Then '<> -> symbol for 'not equal to'
+		fnErrorReport = err.number & " - - " & err.Description
+		Else
+		fnErrorReport = Keyword & " Passed"
+	End If
+	
+	err.clear
+	
+End Function
+
+
+'Function to Save and Quit Excel
+Function fnQuitExcel
+	Dim Today
+	Today = Now
+	Today = Replace (Today, "/", "-")
+	Today = Replace (Today, ":", "_")
+	MyExcel.ActiveWorkbook.SaveAs "C:\Users\VAADMIN\Desktop\Weekend Summer 2016\KDF - INDEED\Keywords, TCs, TSs (INDEED)"&Today&".xlsx"
+	MyExcel.Application.Quit
+	
+	Set MyExcel = Nothing
+	Set TC_Sheet = Nothing
+	Set TS_Sheet = Nothing
+End Function
+
+'Function to verify that a text DOESN'T Exist
+Function text_check2 (Prop_htmlTag, Prop_Innertext)
+	Dim oWebElement
+	Set oWebElement = Description.create
+	oWebElement ("html tag").value = Prop_HtmlTag
+	oWebElement ("innertext").value = Prop_Innertext
+	
+	If MyBrowser.WebElement(oWebElement).exist(3) Then
+		text_check2 = TRUE
+		else
+		text_check2 = FALSE
+	End If
+	
+	If fnErrorReport = Keyword & " Passed" Then
+		TS_Sheet.Cells(j, "I").Value = "Passed"
+		TS_Sheet.cells(j,"J").Value = "N/A"
+		Else
+		TS_Sheet.Cells(j,"I").Value = "Failed"
+		TS_Sheet.Cells(j,"J").Value = fnErrorReport
+	End If
+	
+	Set oWebElement = Nothing
+End Function
+
+
+
+
+
+
+
+
+

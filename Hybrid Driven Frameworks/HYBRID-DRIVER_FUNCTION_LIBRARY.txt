@@ -1,0 +1,220 @@
+'*************************************************
+'Function to report Errors
+'*************************************************
+	'Purpose: Report any errors encountered
+	'I/P: None
+	'O/P: ERR.NUMBER -- ERR.DESCRIPTION OR {keyword} Passed
+Function fnErrorReport
+
+	If err.number <> 0 Then
+		fnErrorReport = err.number & " -- " & Err.Description 
+		Print "Error Occured - " & err.number & " -- " & err.description & " -- " & "TC Number: " & Datatable.Value ("TCID", "DT_TestSteps") & " - " & "step number: "& Datatable.Value ("StepNo.", "DT_TestSteps")
+		Environment("Error") = fnErrorReport
+		Else
+		fnErrorReport = Keyword & " Passed"
+		Print "No Error Occured " & "Step Number: " & DataTable.Value ("StepNo.", "DT_TestSteps")
+	End If
+	
+err.clear
+End Function
+'**************************************************
+
+Function fnGetInputs(fIP1,fIP2, fIP3)
+'PURPOSE: Read the input values from the TEST STEPS SHEET and store them into the variables called fIP1, fIP2, and fIP3 - Defining the values of the variables found in IP1, IP2, & IP3 on the Test Steps Sheet
+
+'Reading the values from the Test Steps Sheet in columns IP1, IP2, IP3
+fIP1 = DataTable.Value ("IP1", "DT_TestSteps")
+fIP2 = DataTable.Value ("IP2", "DT_TestSteps")
+fIP3 = DataTable.Value ("IP3", "DT_TestSteps")
+
+	'Redefining the value of fIP1 IF the value of fIP1 is a Variable (if it's hard coded, then we're going to leave fIP1 alone)
+	Select Case fIP1
+		Case "vBrowsers"
+		fIP1 = environment("vBrowsers")
+		Case "vAppURL"
+		fIP1 = environment("vURL")
+		Case "vHtmlTag_set"
+		fIP1 = environment("Set_HTMLTag")
+		Case "vHtmlTag_check"
+		fIP1 = environment("Check_HtmlTag")
+		Case "vSearchText"
+		fIP1 = environment("vSearchText")
+		Case "vJobTitle"
+		fIP1 = environment("vJobTitle")
+		Case "vCity"
+		fIP1 = environment("vCity")
+		Case "vZipCode"
+		fIP1 = environment("vZip")
+		Case "vLinkText"
+		fIP1 = environment("vLinkText")
+		Case "vVerifyJob"
+		fIP1 = environment("vVerifyJobTitle")
+		Case "vName_Job"
+		fIP1 = environment("vName_Job")
+		Case "vName_Location"
+		fIP1 = environment("vName_Location")
+		Case "vName_SearchButton"
+		fIP1 = environment("vSearchButton_Name")
+		Case "vHtmlTag_Button"
+		fIP1 = environment("vSearch_ButtonTag")
+		Case "vIndex"
+		fIP1 = environment("vLink_Index")
+	End Select
+
+	'Redefining the value of fIP2 IF the value of fIP2 is a Variable (if it's hard coded, then we're going to leave fIP2 alone)
+	Select Case fIP2
+		Case "vBrowsers"
+		fIP2 = environment("vBrowsers")
+		Case "vAppURL"
+		fIP2 = environment("vURL")
+		Case "vHtmlTag_set"
+		fIP2 = environment("Set_HTMLTag")
+		Case "vHtmlTag_check"
+		fIP2 = environment("Check_HtmlTag")
+		Case "vSearchText"
+		fIP2 = environment("vSearchText")
+		Case "vJobTitle"
+		fIP2 = environment("vJobTitle")
+		Case "vCity"
+		fIP2 = environment("vCity")
+		Case "vZipCode"
+		fIP2 = environment("vZip")
+		Case "vLinkText"
+		fIP2 = environment("vLinkText")
+		Case "vVerifyJob"
+		fIP2 = environment("vVerifyJobTitle")
+		Case "vName_Job"
+		fIP2 = environment("vName_Job")
+		Case "vName_Location"
+		fIP2 = environment("vName_Location")
+		Case "vName_SearchButton"
+		fIP2 = environment("vSearchButton_Name")
+		Case "vHtmlTag_Button"
+		fIP2 = environment("vSearch_ButtonTag")
+		Case "vIndex"
+		fIP2 = environment("vLink_Index")
+	End Select
+	
+	'Redefining the value of fIP3 IF the value of fIP3 is a Variable (if it's hard coded, then we're going to leave fIP3 alone)
+    Select Case fIP3
+        Case "vBrowsers"
+        fIP3 = environment("vBrowsers")
+        Case "vAppURL"
+        fIP3 = environment("vURL")
+        Case "vHtmlTag_set"
+        fIP3 = environment("Set_HTMLTag")
+        Case "vHtmlTag_check"
+        fIP3 = environment("Check_HtmlTag")
+        Case "vSearchText"
+        fIP3 = environment("vSearchText")
+        Case "vJobTitle"
+        fIP3 = environment("vJobTitle")
+        Case "vCity"
+        fIP3 = environment("vCity")
+        Case "vZipCode"
+        fIP3 = environment("vZip")
+        Case "vLinkText"
+        fIP3 = environment("vLinkText")
+        Case "vVerifyJob"
+        fIP3 = environment("vVerifyJobTitle")
+        Case "vName_Job"
+        fIP3 = environment("vName_Job")
+        Case "vName_Location"
+        fIP3 = environment("vName_Location")
+        Case "vName_SearchButton"
+        fIP3 = environment("vSearchButton_Name")
+        Case "vHtmlTag_Button"
+        fIP3 = environment("vSearch_ButtonTag")
+        Case "vIndex"
+        fIP3 = environment("vLink_Index")
+    End Select
+
+	'We now have a Single value within fIP1, fIP2, & fIP3 as a result of each of the select Case statements 
+	
+	'Now we need to store the values that are in fIP1, fIP2, fIP3 into global variables (environment variables) so we can use them later
+	
+	environment("IP1") = fIP1
+	environment("IP2") = fIP2
+	environment("IP3") = fIP3
+
+End Function
+
+
+Function ExecuteKeywords (Keyword, fIP1, fIP2, fIP3)
+
+'Purpose: Execute the Keywords and ensure that IF there are any errors that occur during the execution of any keyword, the error number & description are noted appropriately and the test run continues
+
+
+On Error Resume Next 'In case there is an error thrown by UFT, we want to make a note of it, but we want the test run to coninue
+
+'Calling the function to capture the Inputs and store them into environment variables named environment("IP1"), environment("IP2"), & environment("IP3")
+fnGetInputs fIP1, fIP2, fIP3
+
+	'Creating 2 environment variables called "Result" & "Error" and setting default values for them as "Passed" & "No Error" respectively. During the execution of each keyword (function) the values for these environment variables can change if there is an error that occurs.
+	environment("Result") = "Passed"
+	environment("Error") = "No Error"
+
+		Select Case Keyword
+				Case "browser_open"
+				Browser_open environment("IP1"), environment("IP2") 'calling the function
+				Case "button_click"
+				Button_Click environment("IP1"), environment("IP2") 'calling the function
+				Case "text_check"
+				If Text_Check (environment("IP1"), environment("IP2")) Then
+					Print "Text_Check Passed"
+					Else										'calling the function
+					Print "Text_Check Failed"
+				End if
+				Case "browser_close"
+				Browser_Close environment("IP1") 'calling the function
+				Case "link_click"
+				link_click environment("IP1"), environment("IP2"), environment("IP3") 'calling the function
+				Case "edit_set"
+				Edit_set environment("IP1"), environment("IP2"), environment("IP3") 'calling the function
+				Case Else
+				msgbox "Keyword Undefined"
+			End Select
+
+On Error Goto 0 'Turning off our error handling because we want to move on from errors thrown only during the execution of the keywords. If errors are thrown during the execution of the driver script, we want to stop the test run at that point. 
+End Function
+
+
+Function fnGetTestData
+'PURPOSE: Get values from the test data sheet in the data table and store them in environment variables to be used later
+
+' - IF WE WANT TO READ FROM EXCEL INSTEAD OF DATA TABLE:
+'envrionment("vURL") = TestDataSheet.cells(i,"C") -> Reading from Excel (must create the connection first however)
+
+environment("vURL") = DataTable.Value ("URL", "DT_TestData")
+environment("vBrowsers") = DataTable.Value ("Browser", "DT_TestData")
+environment("vCity") = DataTable.Value ("City", "DT_TestData")
+environment("vZip") = DataTable.Value ("Zip", "DT_TestData")
+environment("vJobTitle") = DataTable.Value ("JobTitle", "DT_TestData")
+environment("vSearchText") = DataTable.Value ("Search_Text", "DT_TestData")
+environment("vLinkText") = DataTable.Value ("LinkText", "DT_TestData")
+environment("Set_HTMLTag") = DataTable.Value ("HtmlTag_Set", "DT_TestData")
+environment("Check_HtmlTag") = DataTable.Value ("HtmlTag_Check", "DT_TestData")
+environment("vVerifyJobTitle") = DataTable.Value ("VerifyJobTitle", "DT_TestData")
+environment("vName_Job") = DataTable.Value ("Name_Job", "DT_TestData")
+environment("vName_Location") = DataTable.Value ("Name_Location", "DT_TestData")
+environment("vSearch_ButtonTag") = DataTable.Value ("Search_ButtonTag", "DT_TestData")
+environment("vLink_Index") = DataTable.Value ("Link_Index", "DT_TestData")
+environment("vSearchButton_Name") = DataTable.Value ("SearchButton_Name", "DT_TestData")
+End Function
+
+
+Sub spErrorReports
+'Purpose: To execute the following Conditional Statement (executing this bit of code)
+
+	If fnErrorReport = Keyword & " Passed" Then
+		environment("Result") = "Passed"
+		environment("Error") = "N/A"
+		DataTable.Value ("Result", "DT_TestSteps") = environment("Result")
+		DataTable.Value ("Error", "DT_TestSteps") = environment("Error")
+		Else
+		environment("Result") = "Failed"
+		environment("Error") = fnErrorReport
+		DataTable.Value ("Result", "DT_TestSteps") = environment("Result")
+		DataTable.Value ("Error", "DT_TestSteps") = environment("Error")
+	End If
+End Sub

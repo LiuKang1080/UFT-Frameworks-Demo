@@ -1,0 +1,309 @@
+Option Explicit
+
+On Error Resume Next 'Turning on Error Handling
+
+Dim Excel_Path, TC_Rows, TS_Rows
+Dim Keyword, IP1, IP2, IP3, IP4
+Dim i, j
+Dim Today
+
+'Associate Function Library
+ExecuteFile "C:\Users\Shiva\Desktop\Weekend Summer 2016\KDF - DICE\Function Library.vbs"
+
+Excel_Path = "C:\Users\Shiva\Desktop\Weekend Summer 2016\KDF - DICE\Keywords, TCs, TSs (DICE).xlsx"
+
+'Add Run-Time Sheets called Dt_TestCases and DT_TestSteps into the Datatable
+DataTable.AddSheet "DT_TestCases"
+DataTable.AddSheet "DT_TestSteps"
+
+
+'Import from Excel the TC Sheet and the TS Sheet into the built-in Datatable
+DataTable.Importsheet Excel_Path, "TestCases", "DT_TestCases"
+DataTable.ImportSheet Excel_Path, "TestSteps", "DT_TestSteps"
+
+'Count the number of rows in the DT_TestCases & DT_TestSteps Sheet
+TC_Rows = DataTable.GetSheet("DT_TestCases").GetRowCount()
+TS_Rows = DataTable.GetSheet("DT_TestSteps").GetRowCount()
+
+
+'Go to each row in the TC Sheet and see if the execute flag is 'Y'
+For i = 1 To TC_Rows
+	DataTable.GetSheet("DT_TestCases").SetCurrentRow(i) 'Sets the focus of the current row in the DT_TestCases Sheet to i
+	
+	If DataTable.Value("Execute", "DT_TestCases") = "Y" Then
+		Print "The test case for execution is: " & DataTable.Value ("TCID", "DT_TestCases")
+		
+		'If 'Y' then go to each row in the TS Sheet and see if the TCIDs match
+		For j = 1 To TS_Rows
+		DataTable.GetSheet("DT_TestSteps").SetCurrentRow(j) 'Sets the focus of the current row in the DT_TestSteps Sheet to j
+			If DataTable.Value("TCID", "DT_TestCases") = DataTable.Value ("TSID", "DT_TestSteps") Then
+				
+				'Read the values of the Keywords and the IPs
+				Keyword = DataTable.Value("Keyword", "DT_TestSteps")
+				IP1 = DataTable.Value ("IP1", "DT_TestSteps")
+				IP2 = DataTable.Value ("IP2", "DT_TestSteps")
+				IP3 = DataTable.Value ("IP3", "DT_TestSteps")
+				IP4 = DataTable.Value ("IP4", "DT_TestSteps")
+				
+				Print "The Keyword for execution is: " & Keyword
+				
+				'Execute the CORRESPONDING Test Steps (or keywords)
+				
+				Select Case Keyword
+					Case "browser_open"
+					browser_open IP1, IP2
+					Case "browser_close"
+					browser_close IP1
+					Case "edit_set"
+					edit_set IP1, IP2, IP3, IP4
+					Case "button_click"
+					button_click IP1, IP2, IP3
+					Case "text_check"
+					If text_check(IP1, IP2, IP3) Then
+						Print "Text is verified"
+						Else
+						Print "Text is not verified"
+					End If
+					Case "link_click"
+					link_click IP1, IP2, IP3
+					Case Else 
+					msgbox "Check your keywords"
+				End Select
+			End If
+		Next
+	End If
+Next
+	
+Today = Now
+Today = Replace (Today, "/", "-")
+Today = Replace (Today, ":", "_")
+	
+'Saving Test Results by exporting the run-time data table sheets to excel
+DataTable.ExportSheet "C:\Users\VAADMIN\Desktop\Weekend Summer 2016\KDF - DICE\Keywords, TCs, TSs (DICE)"&Today&".xlsx", "DT_TestCases"
+DataTable.ExportSheet "C:\Users\VAADMIN\Desktop\Weekend Summer 2016\KDF - DICE\Keywords, TCs, TSs (DICE)"&Today&".xlsx", "DT_TestSteps"
+
+
+
+
+''Each keyword function to return a PASS or FAIL along with a Test Result
+'
+''*************************Function Library**************************************
+''Function Library for Dice KDF
+''Option Explicit
+'
+'Dim MyBrowser
+'Set MyBrowser = Browser("micclass:=Browser", "CreationTime:=0", "title:=.*").Page("micclass:=Page", "CreationTime:=0", "title:=.*")
+'
+''Function to click on any Web Button
+''Inputs: Prop_Name, Prop_Class, Prop_HtmlTag
+''Outputs: N/A
+'Function button_click (Prop_Name, Prop_Class, Prop_HtmlTag)
+''	err.clear
+'	Dim oWebButton
+'	Set oWebButton = Description.Create
+'	oWebButton("name").Value = Prop_Name
+'	oWebButton("class").Value = Prop_Class
+'	oWebButton("html tag").Value = Prop_HtmlTag
+'	MyBrowser.WebButton(oWebButton).Click
+'	Set oWebButton = Nothing
+'	
+'	fnErrorReport
+'	
+'	
+''	If fnErrorReport() Then
+''		DataTable.Value ("Result", "DT_TestSteps") = "Passed"
+''		DataTable.Value ("Error", "DT_TestSteps") = "N/A"
+''		Else
+''		DataTable.Value ("Result", "DT_TestSteps") = "Failed"
+''		DataTable.Value ("Error", "DT_TestSteps") = err.number&" -- "&err.description
+''	End If
+'	
+'End Function 
+'
+'
+''Function to set text in an edit box
+''Inputs: Prop_Name, Prop_HtmlID, Prop_Class, WE_Value
+''Outputs: N/A
+'Function edit_set (Prop_Name, Prop_HtmlID, Prop_Class, WE_Value)
+''	err.clear
+'	Dim oWebEdit
+'	Set oWebEdit = Description.Create
+'	oWebEdit("name").Value = Prop_Name
+'	oWebEdit("html id").Value = Prop_HtmlID
+'	oWebEdit("class").Value = Prop_Class
+'	MyBrowser.WebEdit(oWebEdit).Set WE_Value
+'	Set  oWebEdit = Nothing
+'	
+'	
+'	fnErrorReport
+'	
+'	
+''	If fnErrorReport() Then
+''		DataTable.Value ("Result", "DT_TestSteps") = "Passed"
+''		DataTable.Value ("Error", "DT_TestSteps") = "N/A"
+''		Else
+''		DataTable.Value ("Result", "DT_TestSteps") = "Failed"
+''		DataTable.Value ("Error", "DT_TestSteps") = err.number&" -- "&err.description
+''	End If
+''	
+'	
+'End Function
+'
+''Function to Verify Text
+''Inputs: Prop_HtmlTag, Prop_Class, Prop_InnerText
+''Outputs: True or False
+'Function text_check (Prop_HtmlTag, Prop_Class, Prop_InnerText)
+''	err.clear
+'	Dim oWebElement
+'	Set oWebElement = Description.Create
+'	oWebElement("html tag").Value = Prop_HtmlTag
+'	oWebElement("class").Value = Prop_Class
+'	oWebElement("innertext").Value = Prop_InnerText
+'	
+'	
+'	If MyBrowser.WebElement(oWebElement).Exist(3) Then
+'		text_check = True
+'	Else
+'		text_check = False
+'	End If
+'	
+'	fnErrorReport
+'	
+'	
+'	
+''	If fnErrorReport() Then
+''		DataTable.Value ("Result", "DT_TestSteps") = "Passed"
+''		DataTable.Value ("Error", "DT_TestSteps") = "N/A"
+''		Else
+''		DataTable.Value ("Result", "DT_TestSteps") = "Failed"
+''		DataTable.Value ("Error", "DT_TestSteps") = err.number&" -- "&err.description
+''	End If
+'	
+'	Set oWebElement = Nothing
+'End Function
+'
+'
+''Function to Click on a link
+''Inputs: Prop_HtmlID, Prop_Title, Prop_Class
+''Outputs: N/A
+'Function link_click (Prop_HtmlID, Prop_Title, Prop_Class)
+''	err.clear
+'	Dim oLink
+'	Set oLink = Description.Create
+'	oLink("html id").Value = Prop_HtmlID
+'	oLink("title").Value = Prop_Title
+'	oLink("class").Value = Prop_Class
+'	MyBrowser.Link(oLink).Click
+'	
+'	Set oLink = Nothing
+'	
+'	fnErrorReport
+'	
+'	
+''	If fnErrorReport() Then
+''		DataTable.Value ("Result", "DT_TestSteps") = "Passed"
+''		DataTable.Value ("Error", "DT_TestSteps") = "N/A"
+''		Else
+''		DataTable.Value ("Result", "DT_TestSteps") = "Failed"
+''		DataTable.Value ("Error", "DT_TestSteps") = err.number&" -- "&err.description
+''	End If
+'	
+'End Function
+'
+'
+''Function to Verify a Link
+''Inputs: Prop_HtmlID, Prop_Title, Prop_Class
+''Outputs: True or False
+'Function link_check (Prop_HtmlID, Prop_Title, Prop_Class)
+''	err.clear
+'	Dim oLink
+'	Set oLink = Description.Create
+'	oLink("html id").Value = Prop_HtmlID
+'	oLink("title").Value = Prop_Title
+'	oLink("class").Value = Prop_Class
+'	
+'	
+'	If MyBrowser.Link(oLink).Exist(3) Then
+'		link_check = True
+'	Else
+'		link_check = False
+'	End If
+'	
+'	fnErrorReport
+'	
+''	If fnErrorReport() Then
+''		DataTable.Value ("Result", "DT_TestSteps") = "Passed"
+''		DataTable.Value ("Error", "DT_TestSteps") = "N/A"
+''		Else
+''		DataTable.Value ("Result", "DT_TestSteps") = "Failed"
+''		DataTable.Value ("Error", "DT_TestSteps") = err.number&" -- "&err.description
+''	End If
+''	
+'	
+'	Set oLink = Nothing
+'	
+'End Function
+'
+'
+''Function to Open a Browser
+''Inputs: Browsers, URL
+''Outputs: N/A
+'Function browser_open (Browsers, URL)
+''	err.clear
+'	SystemUtil.Run Browsers, URL
+'	
+'	fnErrorReport
+'	
+''	If fnErrorReport() Then
+''		DataTable.Value ("Result", "DT_TestSteps") = "Passed"
+''		DataTable.Value ("Error", "DT_TestSteps") = "N/A"
+''		Else
+''		DataTable.Value ("Result", "DT_TestSteps") = "Failed"
+''		DataTable.Value ("Error", "DT_TestSteps") = err.number&" -- "&err.description
+''	End If
+'	
+'End Function
+'
+''Function to Close a Browser
+''Inputs: Browsers
+''Outputs: N/A
+'Function browser_close(Browsers)
+''	err.clear
+'	SystemUtil.CloseProcessByName Browsers
+'	
+'	
+'	fnErrorReport
+'	
+''	If fnErrorReport() Then
+''		DataTable.Value ("Result", "DT_TestSteps") = "Passed"
+''		DataTable.Value ("Error", "DT_TestSteps") = "N/A"
+''		Else
+''		DataTable.Value ("Result", "DT_TestSteps") = "Failed"
+''		DataTable.Value ("Error", "DT_TestSteps") = err.number&" -- "&err.description
+''	End If
+''	
+'End Function
+'
+'
+''Function to report Errors
+'Function fnErrorReport
+'	
+'	If err.number = 0 Then
+'		DataTable.Value ("Result", "DT_TestSteps") = "Passed"
+'		DataTable.Value ("Error", "DT_TestSteps") = "N/A"
+'		Else
+'		DataTable.Value ("Result", "DT_TestSteps") = "Failed"
+'		DataTable.Value ("Error", "DT_TestSteps") = err.number&" -- "&err.description
+'	End If
+'	
+'		
+'End Function
+
+   
+
+
+
+
+
+
+

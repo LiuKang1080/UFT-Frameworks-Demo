@@ -1,0 +1,83 @@
+Dim Excel_Path, Row_TC, Row_TS, Row_TD, vKeyword, vIP1, vIP2, vIP3
+Dim i, j, k
+Excel_Path = "C:\User\Shiva\Test Scripts\KDF_DICE\DICE EXCEL WORKBOOK\KEYWORDS TC & STEPS.xlsx"
+
+Excel_Path_Results = "C:\User\Shiva\Test Scripts\KDF_DICE\DICE EXCEL WORKBOOK\Test Results"
+
+
+
+
+'Read Test Cases, and Test Steps Sheet and the Test Data Sheet
+
+'Create new blank data tables
+Datatable.AddSheet "DT_TestCases" 'for test cases
+Datatable.AddSheet "DT_TestSteps" 'for test steps
+DataTable.AddSheet "DT_TestData" 'for test data
+
+'Import from excel into these data tables
+DataTable.ImportSheet Excel_Path, "TestCases", "DT_TestCases"
+DataTable.ImportSheet Excel_Path, "TestSteps", "DT_TestSteps"
+DataTable.ImportSheet Excel_Path, "TestData", "DT_TestData"
+
+'Determine the number of rows in each DT Sheet
+Row_TC = DataTable.GetSheet("DT_TestCases").GetRowCount() 'Return the number of rows in the Data Table for TCs
+Row_TS = DataTable.GetSheet("DT_TestSteps").GetRowCount() 'Return the number of rows in the Data Table for TSs
+Row_TD = DataTable.GetSheet("DT_TestData").GetRowCount() 'Return the number of rows in the Data Table for TDs
+
+
+For k = 1 To Row_TD 'Loop through each row in the Test Data Sheet 
+	DataTable.GetSheet("DT_TestData").SetCurrentRow (k) 'Set Datatable to a specific row	
+	
+	'Determine if we should use that set of data (determine if the Execute flag is "Y")
+	If DataTable.Value("Execute", "DT_TestData") = "Y" Then
+	Print "============"
+	'Load the global environment variables with the test data
+	fnGetTestData 'Only if I want to use that data, will I read that data
+	
+	'Go to each row in the TC sheet and see if the execute flag is "Y"
+		For i = 1 To Row_TC
+			'Go to each row in the TC Sheet 
+			DataTable.GetSheet("DT_TestCases").SetCurrentRow (i) 'Set Datatable to a specific row
+			
+			'See if the Execute column in the Test cases sheet is "Y" indicating that the test case should be executed
+			If DataTable.Value ("Execute", "DT_TestCases") = "Y" Then
+				
+			
+		
+			'and see if the execute flag is 'Y'
+			Print "Test Cases for execution is: " & DataTable.Value ("TCID", "DT_TestCases") & " and the test Data used is: " & datatable.Value ("TDID", "DT_TestData")
+				For j = 1 To Row_TS
+					DataTable.GetSheet("DT_TestSteps").SetCurrentRow (j) 'Set Datatable to a specific row
+					'See if TCID & TSID Match
+					If DataTable.Value("TSID", "DT_TestSteps") = DataTable.Value("TCID", "DT_TestCases") Then
+				
+						'Read Keywords and Inputs
+						vKeyword = datatable.Value ("Keyword", "DT_TestSteps")
+						vIP1 = datatable.value("IP1", "DT_TestSteps")
+						vIP2 = datatable.value("IP2", "DT_TestSteps")
+						vIP3 = datatable.value("IP3", "DT_TestSteps")
+				
+						'Execute the CORRESPONDING Test Steps (or keywords)
+						ExecuteKeywords vKeyword, vIP1, vIP2, vIP3
+						If environment("Result") = "Failed" Then
+							DataTable.Value ("Result", "DT_TestCases") = "Failed"
+							Else
+							DataTable.Value ("Result", "DT_TestCases") = "Passed"
+						End If 'Closing the Environment("Result") Conditional Statement
+	            	End If 'Closing the TSID = TCID Conditional Statement
+				Next 'Continuing the Test Steps Iteration
+			End If 'Closing the Test Cases Execute Column = Y Conditional Statement
+		Next 'Continuing the Test Cases Iteration
+		
+		
+		'Export the DataSheets
+		DataTable.ExportSheet Excel_Path_Results &"_"& DataTable.Value("TDID", "DT_TestData")& ".xlsx", "DT_TestSteps"
+		'TestResults_TD001.xlsx
+		DataTable.ExportSheet Excel_Path_Results &"_"& DataTable.Value("TDID", "DT_TestData")& ".xlsx", "DT_TestCases"
+		
+	End If 'Closing the Test Data Execute Column = Y Conditional Statement
+	
+Next 'Continuing the Test Data Iteration
+
+
+'Each keyword function to return a PASS or FAIL along with a Test Result

@@ -1,0 +1,154 @@
+Option Explicit
+
+Dim MyExcel, Loan1Data, Loan2Data, Loan3Data, Results, URL_Sheet, i
+'Function library for BankRate 
+
+'Function to Connect to Excel
+'Inputs: FilePath 
+'Outputs: N/A
+Function fnConnectExcel (FilePath)
+	Set MyExcel = CreateObject ("Excel.Application")
+	MyExcel.Workbooks.Open FilePath
+	Set Loan1Data = MyExcel.ActiveWorkbook.Worksheets ("Loan1Data")
+	Set Loan2Data = MyExcel.ActiveWorkbook.Worksheets ("Loan2Data")
+	Set Loan3Data = MyExcel.ActiveWorkbook.Worksheets ("Loan3Data")
+	Set Results = MyExcel.ActiveWorkbook.Worksheets ("Results")
+	Set URL_Sheet = MyExcel.ActiveWorkbook.Worksheets ("URL")
+	MyExcel.Application.Visible = True
+End Function
+
+
+'Function to Enter Text into any Web Edit
+'Inputs: WE_Value, Prop_Class, Prop_HtmlTag, Prop_Name
+'Outputs: N/A
+Function fnEnterText(Prop_Class, Prop_HtmlTag, Prop_Name, WE_Value)
+	Dim oWebEdit
+	Set oWebEdit = Description.Create
+	oWebEdit("class").Value = Prop_Class
+	oWebEdit("html tag").Value = Prop_HtmlTag
+	oWebEdit("name").Value = Prop_Name
+	MyBrowser.WebEdit(oWebEdit).Set WE_Value
+	Set oWebEdit = Nothing
+End Function
+
+'Function to Select from a Web List
+'Inputs: WL_Item, Prop_HtmlTag, Prop_Name, Prop_HtmlID
+'Outputs: N/A
+Function fnSelectList (Prop_HtmlTag, Prop_Name, Prop_HtmlID, WL_Item)
+	Dim oWebList
+	Set oWebList = Description.Create
+	oWebList("html tag").Value = Prop_HtmlTag
+	oWebList("name").Value = Prop_Name
+	oWebList("html id").Value = Prop_HtmlID
+	MyBrowser.WebList(oWebList).Select WL_Item
+	Set oWebList = Nothing
+End Function
+
+
+'Function to Capture a value from a Web Element
+'Inputs: Prop_Index
+'Outputs: N/A
+Function fnCaptureElement (Prop_Index)
+	Dim oWebElement, Captured_Value
+	Set oWebElement = Description.Create
+	oWebElement("class").Value = "KJESubTitle KJERight KJERightBold"
+	oWebElement("index").Value = Prop_Index
+	Captured_Value = MyBrowser.WebElement(oWebElement).GetROProperty ("innertext")
+	Captured_Value = Split (Captured_Value, "$")
+	Select Case Prop_Index
+		Case 0
+		Results.Cells(i+1,"A") = Captured_Value(1)
+		Case 1
+		Results.Cells(i+1,"F") = Captured_Value(1)
+		Case 2
+		Results.Cells(i+1,"K") = Captured_Value(1)
+		End Select
+	Set oWebElement = Nothing
+End Function
+
+
+'Function to click on Web Button
+'Inputs: Prop_Name, Prop_HtmlID
+'Outputs: N/A
+Function fnClickButton (Prop_Name, Prop_HtmlID)
+	Dim oWebButton
+	Set oWebButton = Description.Create
+	oWebButton ("Name").Value = Prop_Name
+	oWebButton ("Html ID").Value = Prop_HtmlID
+	MyBrowser.WebButton(oWebButton).Click
+	Set oWebButton = Nothing
+End Function
+
+
+'Function to Open Loan Calculators
+'Inputs: Prop_Index
+'Outputs: 
+Function fnToggleCalcs (Prop_Index)
+	Dim oWebElement
+	Set oWebElement = Description.Create
+	oWebElement("Innertext").Value = "\[\+\]"
+	oWebElement("class").Value = "KJEToggleIcon KJEInputIcon"
+	oWebElement("index").Value = Prop_Index
+	If MyBrowser.WebElement(oWebElement).Exist Then
+		MyBrowser.WebElement(oWebElement).Click
+	End If
+	Set oWebElement = Nothing
+End Function
+
+'Function to launch the application
+Function fnLaunchApp (Browsers, URL)
+	SystemUtil.CloseProcessByName Browsers
+	SystemUtil.Run Browsers, URL
+End Function
+
+'Sub Procedure to Toggle Loan Calcs
+Sub spToggleCalcs
+	fnToggleCalcs 0
+	wait 2
+	fnToggleCalcs 1
+	wait 2
+	fnToggleCalcs 2
+End Sub
+
+'Sub Procedure to Capture the Monthly Payments
+Sub spCapturePayments
+	fnCaptureElement 0
+	wait 2
+	fnCaptureElement 1
+	wait 2
+	fnCaptureElement 2
+End Sub
+
+'Function to capture a value from a Web Table
+'Inputs: WT_Row, WT_Col
+'Outputs:
+'Web Table Method: GetCellData (row, col) => Return the value of the specified cell in the Web Table
+Function fnVerifyCosts (WT_Row, WT_Col)
+	Dim oWebTable, Actual_Costs
+	Set oWebTable = Description.Create
+	oWebTable("class").value = "KJEReportTable"
+	oWebTable("html tag").Value = "TABLE"
+	oWebTable("index").Value = 1
+	Actual_Costs = MyBrowser.WebTable(oWebTable).GetCellData (WT_Row, WT_Col)
+	Actual_Costs = Split (Actual_Costs, "$")
+	Select Case WT_Col
+		Case 2
+		Results.Cells(i+1, "C") = Actual_Costs(1)
+		Case 3
+		Results.Cells(i+1, "H") = Actual_Costs(1)
+		Case 4
+		Results.Cells(i+1, "M") = Actual_Costs(1)
+	End Select
+	Set oWebTable = Nothing
+End Function
+
+
+
+
+
+
+
+
+
+
+
